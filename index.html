@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EarnPro Network - Secure Persistent Data</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-body: #f1f5f9;
+            --sidebar-bg: #0f172a;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        #homeLandingView {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
+            color: white; z-index: 1000; display: flex; justify-content: center; align-items: center; padding: 20px; overflow-y: auto;
+        }
+
+        .hero-box {
+            width: 100%; max-width: 440px; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px;
+            backdrop-filter: blur(12px); box-shadow: 0 25px 50px rgba(0,0,0,0.4);
+        }
+
+        .logo-badge {
+            width: 50px; height: 50px; background: var(--primary); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900;
+            margin: 0 auto 15px auto; color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        aside {
+            width: 260px; background-color: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; box-shadow: 4px 0 15px rgba(0,0,0,0.05); z-index: 100;
+        }
+
+        .brand-box { padding: 20px; font-size: 17px; font-weight: 800; background: rgba(255,255,255,0.03); display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .nav-menu { list-style: none; padding: 15px 0; flex: 1; overflow-y: auto; }
+        .nav-item { padding: 12px 25px; display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 600; color: #94a3b8; transition: all 0.2s; border-left: 4px solid transparent; font-size: 14px; }
+        .nav-item:hover, .nav-item.active { color: white; background: rgba(255,255,255,0.06); border-left-color: var(--primary); }
+
+        main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; width: 100%; }
+        header { background: var(--card-bg); padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+
+        .user-avatar-circle { width: 36px; height: 36px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+        .content-body { padding: 25px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .page-section { display: none; }
+        .page-section.active-page { display: block; animation: fadeIn 0.2s ease-in-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-bottom: 22px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); border-top: 4px solid var(--primary); }
+        .stat-card.success { border-top-color: var(--success); }
+        .stat-card.warning { border-top-color: var(--warning); }
+        .stat-card.danger { border-top-color: var(--danger); }
+
+        .stat-title { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .stat-value { font-size: 22px; font-weight: 800; margin-top: 6px; color: var(--text-main); }
+
+        .panel { background: var(--card-bg); border-radius: 12px; padding: 22px; border: 1px solid var(--border); margin-bottom: 22px; }
+        .panel h3 { margin-bottom: 16px; font-size: 16px; font-weight: 700; }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; color: var(--text-muted); font-weight: 600; }
+
+        .btn { padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; font-size: 13px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+
+        .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 12px; outline: none; background: #fff; }
+        .password-group { position: relative; }
+        .eye-icon { position: absolute; right: 14px; top: 36px; cursor: pointer; color: var(--text-muted); font-size: 15px; }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .badge.active { background: #d1fae5; color: #065f46; }
+        .badge.pending { background: #fef3c7; color: #92400e; }
+
+        .notification-box { position: absolute; right: 20px; top: 60px; width: 300px; background: white; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; z-index: 500; }
+        .notification-item { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 12px; }
+
+        @media(max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: auto; }
+            aside { width: 100%; height: auto; }
+            main { height: auto; overflow: visible; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUTHENTICATION VIEW -->
+    <div id="homeLandingView">
+        <div class="hero-box">
+            <div class="logo-badge">EP</div>
+            <div style="text-align: center; margin-bottom: 18px;">
+                <h1 style="font-size: 20px; font-weight: 800;">EarnPro Network</h1>
+                <p style="color: #94a3b8; font-size: 11px; margin-top: 4px;">Persistent Secure ID System</p>
+            </div>
+            
+            <div id="authContainer">
+                <h3 id="authTitle" style="color: #fff; margin-bottom: 10px; font-size: 15px;">Create Account</h3>
+                <div id="authAlert" style="color: #f87171; font-size: 11px; margin-bottom: 8px; font-weight: 600;"></div>
+                
+                <div id="regFields">
+                    <label style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Full Name</label>
+                    <input type="text" id="authName" class="form-control" placeholder="Enter your name">
+                </div>
+                
+                <label style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Email / Username</label>
+                <input type="text" id="authEmail" class="form-control" placeholder="name@example.com">
+                
+                <div class="password-group" id="passWrapper">
+                    <label style="font-size: 11px; font-weight: 600; color: #cbd5e1;">Password</label>
+                    <input type="password" id="authPass" class="form-control" placeholder="••••••••">
+                    <span class="eye-icon" onclick="togglePasswordVisibility()">👁️</span>
+                </div>
+
+                <div id="loginOptionsRow" style="display: none; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 11px; color: #cbd5e1;">
+                    <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" id="rememberMeCheck" checked> Remember Me (Keep ID Safe)
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%;" id="authSubmitBtn" onclick="processAuthAction()">Register Account</button>
+                
+                <div style="text-align: center; margin-top: 14px; font-size: 11px; color: #94a3b8;">
+                    <span id="authToggleText">Already registered? <a href="#" onclick="switchAuthMode('login')" style="color: #818cf8; font-weight: bold; text-decoration: none;">Login here</a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP DASHBOARD -->
+    <div id="mainAppWrapper" style="display: none; width: 100%; height: 100%;">
+        <aside>
+            <div class="brand-box">
+                <div class="user-avatar-circle" style="width: 28px; height: 28px; font-size: 11px;">EP</div>
+                <span>EarnPro Network</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="switchTab('dashboard', this)">📊 Dashboard & PPT</li>
+                <li class="nav-item" onclick="switchTab('team', this)">👥 Team Network</li>
+                <li class="nav-item" onclick="switchTab('assets', this)">💼 Assets & Summary</li>
+                <li class="nav-item" onclick="switchTab('wallet', this)">💰 Wallet & Payouts</li>
+                <li class="nav-item" id="adminMenuTab" style="display: none;" onclick="switchTab('adminPanel', this)">👑 Owner Panel</li>
+                <li class="nav-item" onclick="userLogout()" style="color: #f87171; margin-top: 15px;">🚪 Logout</li>
+            </ul>
+        </aside>
+
+        <main>
+            <header>
+                <div id="headerTabTitle" style="font-size: 16px; font-weight: 700;">Dashboard Overview</div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div style="position: relative; cursor: pointer;" onclick="toggleNotificationDropdown()">
+                        🔔 <span id="notifBadge" style="position: absolute; top: -5px; right: -8px; background: red; color: white; font-size: 9px; padding: 2px 5px; border-radius: 50%; display: none;">0</span>
+                    </div>
+                    <div class="notification-box" id="notificationDropdown">
+                        <div style="padding: 10px 14px; font-weight: 700; border-bottom: 1px solid var(--border); font-size: 12px; display: flex; justify-content: space-between;">
+                            <span>Notifications</span>
+                            <span style="color: var(--primary); cursor: pointer;" onclick="clearNotifications()">Clear</span>
+                        </div>
+                        <div id="notificationListItems"><div class="notification-item">No new updates.</div></div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="user-avatar-circle" id="headerAvatarLetter">U</div>
+                        <div>
+                            <div id="headerUserName" style="font-weight: 700; font-size: 12px;">User</div>
+                            <div id="headerUserIdDisplay" style="font-size: 10px; color: var(--text-muted);">ID: EP1001</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- DASHBOARD -->
+                <div id="tab-dashboard" class="page-section active-page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Wallet Balance</div>
+                            <div class="stat-value" id="dashBal">₹0</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-title">Direct Team Members</div>
+                            <div class="stat-value" id="dashTeamCount">0</div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>🔗 Persistent Referral Link (WhatsApp Direct)</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="userRefLink" class="form-control" readonly style="margin-bottom:0; background:#f8fafc;">
+                            <button class="btn btn-primary" onclick="copyRefLink()">Copy</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEAM -->
+                <div id="tab-team" class="page-section">
+                    <div class="panel">
+                        <h3>👥 Downline Team</h3>
+                        <table>
+                            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Status</th><th>Joined</th></tr></thead>
+                            <tbody id="teamTableRows"><tr><td colspan="5" style="text-align: center;">No members.</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ASSETS -->
+                <div id="tab-assets" class="page-section">
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-title">Total Invested</div><div class="stat-value" id="assetInvested">₹0</div></div>
+                        <div class="stat-card success"><div class="stat-title">Total Earnings</div><div class="stat-value" id="assetEarned">₹0</div></div>
+                        <div class="stat-card warning"><div class="stat-title">Total Withdrawn</div><div class="stat-value" id="assetWithdrawn">₹0</div></div>
+                    </div>
+                </div>
+
+                <!-- WALLET -->
+                <div id="tab-wallet" class="page-section">
+                    <div class="panel" style="max-width: 550px;">
+                        <h3>💸 Request Payout</h3>
+                        <label style="font-size: 11px;">Amount (₹)</label>
+                        <input type="number" id="wAmount" class="form-control" placeholder="Enter amount">
+                        <label style="font-size: 11px;">UPI ID</label>
+                        <input type="text" id="wDestination" class="form-control" placeholder="username@upi">
+                        <button class="btn btn-success" style="width: 100%;" onclick="submitWithdrawal()">Request Withdrawal</button>
+                    </div>
+                </div>
+
+                <!-- ADMIN -->
+                <div id="tab-adminPanel" class="page-section">
+                    <div class="panel">
+                        <h3>👑 Manage Persistent Users</h3>
+                        <table>
+                            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Action</th></tr></thead>
+                            <tbody id="adminUsersTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SCRIPT LOGIC WITH PERMANENT PERSISTENCE -->
+    <script>
+        // Secure Persistent Database Sync (Never deletes user data on update)
+        const DB_VERSION = "ep_v6_persistent_db";
+        if (!localStorage.getItem(DB_VERSION)) {
+            const defaultUsers = [
+                { id: "EP1000", name: "Platform Owner", email: "admin@earnpro.com", pass: "admin123", role: "admin", status: "VIP Active", balance: 5000, totalEarned: 5000, invested: 1000, withdrawn: 0, bonus: 500, upline: "System", joined: "2026-01-01", blocked: false },
+                { id: "EP1001", name: "Rahul Sharma", email: "rahul@gmail.com", pass: "123456", role: "user", status: "VIP Active", balance: 1500, totalEarned: 1800, invested: 500, withdrawn: 300, bonus: 150, upline: "EP1000", joined: "2026-06-01", blocked: false }
+            ];
+            // Preserve older data if exists from previous versions
+            let oldData = localStorage.getItem('ep_users_v5') || localStorage.getItem('ep_users_v4');
+            if (oldData) {
+                try { localStorage.setItem(DB_VERSION, oldData); } catch(e) { localStorage.setItem(DB_VERSION, JSON.stringify(defaultUsers)); }
+            } else {
+                localStorage.setItem(DB_VERSION, JSON.stringify(defaultUsers));
+            }
+        }
+        if (!localStorage.getItem('ep_withdrawals_v6')) localStorage.setItem('ep_withdrawals_v6', JSON.stringify([]));
+        if (!localStorage.getItem('ep_notifs_v6')) localStorage.setItem('ep_notifs_v6', JSON.stringify([{ text: "Persistent Storage Active.", time: "Now" }]));
+
+        let loggedEmail = localStorage.getItem('ep_logged_session') || sessionStorage.getItem('ep_logged_session') || null;
+        let authMode = 'login'; // Default to login so existing users can easily access
+
+        window.onload = function() {
+            if (loggedEmail) {
+                bootDashboard();
+            } else {
+                switchAuthMode('login');
+            }
+        };
+
+        function switchAuthMode(mode) {
+            authMode = mode;
+            const title = document.getElementById('authTitle');
+            const regFields = document.getElementById('regFields');
+            const subBtn = document.getElementById('authSubmitBtn');
+            const toggleText = document.getElementById('authToggleText');
+            const loginOpts = document.getElementById('loginOptionsRow');
+            document.getElementById('authAlert').innerText = "";
+
+            if (mode === 'register') {
+                title.innerText = "Create New Account";
+                regFields.style.display = "block";
+                loginOpts.style.display = "none";
+                subBtn.innerText = "Register & Keep Data";
+                toggleText.innerHTML = `Already have an ID? <a href="#" onclick="switchAuthMode('login')" style="color: #818cf8; font-weight: bold; text-decoration: none;">Login here</a>`;
+            } else {
+                title.innerText = "Member Login (Saved IDs)";
+                regFields.style.display = "none";
+                loginOpts.style.display = "flex";
+                subBtn.innerText = "Login to Dashboard";
+                toggleText.innerHTML = `New user? <a href="#" onclick="switchAuthMode('register')" style="color: #818cf8; font-weight: bold; text-decoration: none;">Register here</a>`;
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('authPass');
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
+        }
+
+        function processAuthAction() {
+            const email = document.getElementById('authEmail').value.trim();
+            const pass = document.getElementById('authPass').value.trim();
+            const alertBox = document.getElementById('authAlert');
+            alertBox.innerText = "";
+
+            if (!email || !pass) { alertBox.innerText = "Enter email and password."; return; }
+
+            let users = JSON.parse(localStorage.getItem(DB_VERSION));
+
+            if (authMode === 'register') {
+                const name = document.getElementById('authName').value.trim();
+                if (!name) { alertBox.innerText = "Enter your full name."; return; }
+                
+                // Prevent duplicate registration with same email/ID
+                if (users.find(u => u.email === email)) {
+                    alertBox.innerText = "This email is already registered! Please login directly.";
+                    return;
+                }
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const sponsorId = urlParams.get('ref') || "EP1000";
+                const newId = `EP10${users.length + 1}`;
+
+                users.push({
+                    id: newId, name, email, pass, role: "user", status: "Active",
+                    balance: 0, totalEarned: 0, invested: 0, withdrawn: 0, bonus: 0,
+                    upline: sponsorId, joined: new Date().toISOString().split('T')[0], blocked: false
+                });
+                localStorage.setItem(DB_VERSION, JSON.stringify(users));
+                alert(`Account created successfully! Your ID is ${newId}. Now login.`);
+                switchAuthMode('login');
+
+            } else {
+                let found = users.find(u => u.email === email && u.pass === pass);
+                if (found) {
+                    if (found.blocked) { alertBox.innerText = "Account blocked."; return; }
+                    loggedEmail = found.email;
+                    
+                    // Permanent Session Storage based on Remember Me
+                    if (document.getElementById('rememberMeCheck').checked) {
+                        localStorage.setItem('ep_logged_session', loggedEmail);
+                    } else {
+                        sessionStorage.setItem('ep_logged_session', loggedEmail);
+                    }
+                    bootDashboard();
+                } else {
+                    alertBox.innerText = "Incorrect email or password!";
+                }
+            }
+        }
+
+        function userLogout() {
+            localStorage.removeItem('ep_logged_session');
+            sessionStorage.removeItem('ep_logged_session');
+            location.reload();
+        }
+
+        function bootDashboard() {
+            if (!loggedEmail) return;
+
+            document.getElementById('homeLandingView').style.display = 'none';
+            document.getElementById('mainAppWrapper').style.display = 'flex';
+
+            let users = JSON.parse(localStorage.getItem(DB_VERSION));
+            let currentUser = users.find(u => u.email === loggedEmail);
+            if (!currentUser) { userLogout(); return; }
+
+            document.getElementById('headerUserName').innerText = currentUser.name;
+            document.getElementById('headerUserIdDisplay').innerText = `ID: ${currentUser.id}`;
+            document.getElementById('headerAvatarLetter').innerText = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('userRefLink').value = `${window.location.origin}${window.location.pathname}?ref=${currentUser.id}`;
+
+            if (currentUser.role === 'admin') document.getElementById('adminMenuTab').style.display = 'flex';
+
+            document.getElementById('dashBal').innerText = `₹${currentUser.balance}`;
+            document.getElementById('assetInvested').innerText = `₹${currentUser.invested}`;
+            document.getElementById('assetEarned').innerText = `₹${currentUser.totalEarned}`;
+            document.getElementById('assetWithdrawn').innerText = `₹${currentUser.withdrawn}`;
+
+            let team = users.filter(u => u.upline === currentUser.id);
+            document.getElementById('dashTeamCount').innerText = team.length;
+            let teamBody = document.getElementById('teamTableRows');
+            teamBody.innerHTML = "";
+            team.forEach(t => {
+                teamBody.innerHTML += `<tr><td>${t.id}</td><td>${t.name}</td><td>${t.email}</td><td><span class="badge active">${t.status}</span></td><td>${t.joined}</td></tr>`;
+            });
+            if(team.length === 0) teamBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No downline team yet.</td></tr>`;
+
+            renderNotifications();
+            if (currentUser.role === 'admin') renderAdminPanel();
+        }
+
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active-page'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active-page');
+            el.classList.add('active');
+        }
+
+        function submitWithdrawal() {
+            let amt = Number(document.getElementById('wAmount').value);
+            let dest = document.getElementById('wDestination').value.trim();
+            if (!amt || !dest) { alert("Enter valid details."); return; }
+
+            let users = JSON.parse(localStorage.getItem(DB_VERSION));
+            let u = users.find(item => item.email === loggedEmail);
+            if (amt > u.balance) { alert("Insufficient balance!"); return; }
+
+            u.balance -= amt;
+            u.withdrawn += amt;
+            localStorage.setItem(DB_VERSION, JSON.stringify(users));
+            alert("Withdrawal requested successfully!");
+            bootDashboard();
+        }
+
+        function renderNotifications() {
+            let list = JSON.parse(localStorage.getItem('ep_notifs_v6'));
+            let badge = document.getElementById('notifBadge');
+            if (list.length > 0) { badge.style.display = 'inline-block'; badge.innerText = list.length; }
+        }
+
+        function toggleNotificationDropdown() {
+            let box = document.getElementById('notificationDropdown');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function clearNotifications() {
+            localStorage.setItem('ep_notifs_v6', JSON.stringify([]));
+            document.getElementById('notifBadge').style.display = 'none';
+        }
+
+        function renderAdminPanel() {
+            let users = JSON.parse(localStorage.getItem(DB_VERSION));
+            let uTable = document.getElementById('adminUsersTable');
+            uTable.innerHTML = "";
+            users.forEach(u => {
+                uTable.innerHTML += `<tr><td>${u.id}</td><td>${u.name}</td><td>${u.email}</td><td><span class="badge active">${u.status}</span></td></tr>`;
+            });
+        }
+
+        function copyRefLink() {
+            let copyText = document.getElementById("userRefLink");
+            copyText.select();
+            document.execCommand("copy");
+            alert("Referral link copied!");
+        }
+    </script>
+</body>
+</html>
